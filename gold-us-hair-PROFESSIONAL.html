@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold US Hair - Professional Hair Salon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-gold { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in; }
+        .animate-slide-up { animation: slideUp 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .shine { position: relative; overflow: hidden; }
+        .shine::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shine 3s infinite; }
+        @keyframes shine { to { left: 100%; } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 via-yellow-50 to-orange-50">
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Icons
+        const Calendar = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+        const MapPin = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>;
+        const Phone = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>;
+        const Mail = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>;
+        const Clock = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+        const Sparkles = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v18m9-9H3m16.5-6.5l-13 13m13 0l-13-13"/></svg>;
+        const Lock = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+        const Users = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+        const Download = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
+        const ChevronLeft = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>;
+        const Plus = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
+        const Edit2 = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>;
+        const Trash2 = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>;
+        const LinkIcon = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>;
+        const ChevronRight = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>;
+
+        // Business info - YOU CAN CUSTOMIZE THIS!
+        const BUSINESS_INFO = {
+            name: "Gold US Hair",
+            tagline: "Premium Hair Styling & Beauty Services",
+            phone: "+1 (555) 123-4567",
+            email: "info@goldushair.com",
+            address: "123 5th Avenue, New York, NY 10001",
+            hours: {
+                weekdays: "Monday - Friday: 9:00 AM - 7:00 PM",
+                saturday: "Saturday: 10:00 AM - 6:00 PM",
+                sunday: "Sunday: Closed"
+            },
+            about: "Gold US Hair is your premier destination for exceptional hair care and styling. With over 15 years of experience, our team of expert stylists is dedicated to bringing out the best in you. We specialize in cuts, colors, treatments, and special occasion styling.",
+            services: [
+                "Haircuts & Styling",
+                "Hair Coloring & Highlights",
+                "Keratin Treatments",
+                "Wedding & Special Events",
+                "Hair Extensions",
+                "Deep Conditioning Treatments"
+            ]
+        };
+
+        // Admin password - CHANGE THIS!
+        const ADMIN_PASSWORD = "admin123";
+
+        const generateId = () => Math.random().toString(36).substr(2, 9);
+        const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        const addToGoogleCalendar = (appointment, customerName, locationName, locationAddress) => {
+            const startDate = new Date(appointment.date + 'T' + appointment.time);
+            const endDate = new Date(startDate.getTime() + appointment.duration * 60000);
+            const formatGoogleDate = (date) => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            const title = encodeURIComponent(`Hair Appointment - ${customerName}`);
+            const details = encodeURIComponent(`Appointment at Gold US Hair\nLocation: ${locationName}\nAddress: ${locationAddress}`);
+            const location = encodeURIComponent(`${locationName}, ${locationAddress}`);
+            const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
+            window.open(googleCalendarUrl, '_blank');
+        };
+        
+        const generateICS = (apt, name, loc) => {
+            const s = new Date(apt.date + 'T' + apt.time), e = new Date(s.getTime() + apt.duration * 60000);
+            const f = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            return `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nUID:${apt.id}@goldushair\nDTSTAMP:${f(new Date())}\nDTSTART:${f(s)}\nDTEND:${f(e)}\nSUMMARY:Hair Appointment\nDESCRIPTION:${loc}\nLOCATION:${loc}\nEND:VEVENT\nEND:VCALENDAR`;
+        };
+
+        // Demo data
+        const DEMO_CUSTOMERS = [
+            { id: 'cust1', name: 'John Doe', email: 'john@example.com', phone: '555-0100' },
+            { id: 'cust2', name: 'Jane Smith', email: 'jane@example.com', phone: '555-0200' }
+        ];
+
+        const DEMO_LOCATIONS = [
+            { id: 'loc1', name: 'Manhattan Salon', address: '123 5th Avenue, New York, NY', availableDays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], startTime: '09:00', endTime: '18:00', slotDuration: 60 },
+            { id: 'loc2', name: 'Brooklyn Salon', address: '456 Bedford Ave, Brooklyn, NY', availableDays: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], startTime: '10:00', endTime: '19:00', slotDuration: 60 }
+        ];
+
+        const generateDemoSchedule = () => {
+            const schedule = [];
+            const today = new Date();
+            for (let i = 0; i < 14; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
+                if (['Sunday', 'Monday', 'Wednesday'].includes(dayName)) {
+                    schedule.push({ date: date.toISOString().split('T')[0], locationId: 'loc1' });
+                } else if (['Tuesday', 'Thursday', 'Friday', 'Saturday'].includes(dayName)) {
+                    schedule.push({ date: date.toISOString().split('T')[0], locationId: 'loc2' });
+                }
+            }
+            return schedule;
+        };
+
+        const DEMO_SCHEDULE = generateDemoSchedule();
+
+        function App() {
+            const [isAdmin, setIsAdmin] = useState(false);
+            const [showLogin, setShowLogin] = useState(false);
+            const [password, setPassword] = useState('');
+            const [view, setView] = useState('admin');
+            const [bookingId, setBookingId] = useState(null);
+            const [customers, setCustomers] = useState([]);
+            const [locations, setLocations] = useState([]);
+            const [schedule, setSchedule] = useState([]);
+            const [appointments, setAppointments] = useState([]);
+
+            useEffect(() => {
+                // Check if admin is logged in
+                const adminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+                setIsAdmin(adminLoggedIn);
+
+                // Load data
+                const storedCustomers = localStorage.getItem('customers');
+                const storedLocations = localStorage.getItem('locations');
+                const storedSchedule = localStorage.getItem('schedule');
+                const storedAppointments = localStorage.getItem('appointments');
+
+                setCustomers(!storedCustomers || JSON.parse(storedCustomers).length === 0 ? DEMO_CUSTOMERS : JSON.parse(storedCustomers));
+                setLocations(!storedLocations || JSON.parse(storedLocations).length === 0 ? DEMO_LOCATIONS : JSON.parse(storedLocations));
+                setSchedule(!storedSchedule || JSON.parse(storedSchedule).length === 0 ? DEMO_SCHEDULE : JSON.parse(storedSchedule));
+                setAppointments(storedAppointments ? JSON.parse(storedAppointments) : []);
+
+                // Check for booking link
+                const params = new URLSearchParams(window.location.search);
+                const booking = params.get('booking');
+                if (booking) {
+                    setBookingId(booking);
+                }
+            }, []);
+
+            useEffect(() => { localStorage.setItem('customers', JSON.stringify(customers)); }, [customers]);
+            useEffect(() => { localStorage.setItem('locations', JSON.stringify(locations)); }, [locations]);
+            useEffect(() => { localStorage.setItem('schedule', JSON.stringify(schedule)); }, [schedule]);
+            useEffect(() => { localStorage.setItem('appointments', JSON.stringify(appointments)); }, [appointments]);
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                if (password === ADMIN_PASSWORD) {
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    setIsAdmin(true);
+                    setShowLogin(false);
+                    setPassword('');
+                } else {
+                    alert('❌ Incorrect password!');
+                }
+            };
+
+            const handleLogout = () => {
+                sessionStorage.removeItem('adminLoggedIn');
+                setIsAdmin(false);
+                setView('admin');
+            };
+
+            // If there's a booking ID, show booking page (no login required)
+            if (bookingId) {
+                return <BookingPage id={bookingId} customers={customers} locations={locations} schedule={schedule} appointments={appointments} setAppointments={setAppointments} />;
+            }
+
+            // If not admin, show public landing page
+            if (!isAdmin) {
+                return <PublicLandingPage onAdminClick={() => setShowLogin(true)} showLogin={showLogin} onCloseLogin={() => setShowLogin(false)} password={password} setPassword={setPassword} handleLogin={handleLogin} />;
+            }
+
+            // Admin panel
+            return <AdminPanel view={view} setView={setView} customers={customers} setCustomers={setCustomers} locations={locations} setLocations={setLocations} schedule={schedule} setSchedule={setSchedule} appointments={appointments} setAppointments={setAppointments} onLogout={handleLogout} setBookingId={setBookingId} />;
+        }
+
+        function PublicLandingPage({ onAdminClick, showLogin, onCloseLogin, password, setPassword, handleLogin }) {
+            return (
+                <div className="min-h-screen">
+                    {/* Header */}
+                    <header className="gradient-gold shadow-2xl relative overflow-hidden shine">
+                        <div className="max-w-7xl mx-auto px-4 py-8">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4 animate-fade-in">
+                                    <div className="bg-white bg-opacity-20 p-4 rounded-2xl backdrop-blur">
+                                        <Sparkles className="w-10 h-10 text-white" />
+                                    </div>
+                                    <div>
+                                        <h1 className="text-4xl font-bold text-white drop-shadow-lg">{BUSINESS_INFO.name}</h1>
+                                        <p className="text-yellow-100 text-lg font-medium mt-1">{BUSINESS_INFO.tagline}</p>
+                                    </div>
+                                </div>
+                                <button onClick={onAdminClick} className="flex items-center space-x-2 px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-xl text-white backdrop-blur transition-all">
+                                    <Lock className="w-5 h-5" />
+                                    <span className="font-semibold">Admin</span>
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Hero Section */}
+                    <div className="max-w-7xl mx-auto px-4 py-16">
+                        <div className="text-center mb-16 animate-slide-up">
+                            <h2 className="text-5xl font-bold text-gray-900 mb-4">Welcome to {BUSINESS_INFO.name}</h2>
+                            <p className="text-xl text-gray-600 max-w-2xl mx-auto">{BUSINESS_INFO.about}</p>
+                        </div>
+
+                        {/* Contact Info Cards */}
+                        <div className="grid md:grid-cols-3 gap-6 mb-16">
+                            <div className="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all">
+                                <div className="w-16 h-16 gradient-gold rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Phone className="w-8 h-8 text-white" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Call Us</h3>
+                                <a href={`tel:${BUSINESS_INFO.phone}`} className="text-lg text-yellow-600 hover:text-yellow-700 font-semibold">{BUSINESS_INFO.phone}</a>
+                            </div>
+
+                            <div className="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all">
+                                <div className="w-16 h-16 gradient-gold rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Mail className="w-8 h-8 text-white" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Email Us</h3>
+                                <a href={`mailto:${BUSINESS_INFO.email}`} className="text-lg text-yellow-600 hover:text-yellow-700 font-semibold">{BUSINESS_INFO.email}</a>
+                            </div>
+
+                            <div className="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all">
+                                <div className="w-16 h-16 gradient-gold rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <MapPin className="w-8 h-8 text-white" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Visit Us</h3>
+                                <p className="text-gray-600 font-medium">{BUSINESS_INFO.address}</p>
+                            </div>
+                        </div>
+
+                        {/* Hours */}
+                        <div className="bg-white rounded-2xl shadow-xl p-8 mb-16">
+                            <div className="flex items-center justify-center space-x-3 mb-6">
+                                <Clock className="w-8 h-8 text-yellow-600" />
+                                <h3 className="text-3xl font-bold text-gray-900">Business Hours</h3>
+                            </div>
+                            <div className="space-y-3 text-center">
+                                <p className="text-lg text-gray-700 font-medium">{BUSINESS_INFO.hours.weekdays}</p>
+                                <p className="text-lg text-gray-700 font-medium">{BUSINESS_INFO.hours.saturday}</p>
+                                <p className="text-lg text-gray-700 font-medium">{BUSINESS_INFO.hours.sunday}</p>
+                            </div>
+                        </div>
+
+                        {/* Services */}
+                        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl shadow-xl p-8 border border-yellow-200">
+                            <h3 className="text-3xl font-bold text-gray-900 text-center mb-8">Our Services</h3>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {BUSINESS_INFO.services.map((service, i) => (
+                                    <div key={i} className="flex items-center space-x-3 bg-white rounded-xl p-4 shadow">
+                                        <Sparkles className="w-6 h-6 text-yellow-600" />
+                                        <span className="text-gray-900 font-semibold">{service}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Login Modal */}
+                    {showLogin && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+                            <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md animate-slide-up">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-2xl font-bold text-gray-900">Admin Login</h3>
+                                    <button onClick={onCloseLogin} className="text-gray-400 hover:text-gray-600">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
+                                </div>
+                                <form onSubmit={handleLogin} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Password</label>
+                                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all" placeholder="Enter admin password" required autoFocus />
+                                    </div>
+                                    <button type="submit" className="w-full py-3 gradient-gold text-white rounded-xl hover:shadow-xl transition-all font-bold text-lg">
+                                        Login
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function AdminPanel({ view, setView, customers, setCustomers, locations, setLocations, schedule, setSchedule, appointments, setAppointments, onLogout, setBookingId }) {
+            return (
+                <div className="min-h-screen">
+                    <header className="gradient-gold shadow-2xl">
+                        <div className="max-w-7xl mx-auto px-4 py-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <Lock className="w-8 h-8 text-white" />
+                                    <h1 className="text-2xl font-bold text-white">Admin Panel - {BUSINESS_INFO.name}</h1>
+                                </div>
+                                <button onClick={onLogout} className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-xl text-white backdrop-blur transition-all font-semibold">
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    <nav className="bg-white shadow-lg sticky top-0 z-40">
+                        <div className="max-w-7xl mx-auto px-4 flex space-x-2">
+                            {['admin', 'customers', 'locations', 'schedule'].map(v => (
+                                <button key={v} onClick={() => setView(v)} className={`px-6 py-4 text-sm font-semibold border-b-3 transition-all ${view === v ? 'border-yellow-500 text-yellow-600 bg-yellow-50' : 'border-transparent text-gray-600 hover:text-yellow-600'}`}>
+                                    {v === 'admin' && <><Calendar className="w-4 h-4 inline mr-2" />Dashboard</>}
+                                    {v === 'customers' && <><Users className="w-4 h-4 inline mr-2" />Customers</>}
+                                    {v === 'locations' && <><MapPin className="w-4 h-4 inline mr-2" />Locations</>}
+                                    {v === 'schedule' && <><Clock className="w-4 h-4 inline mr-2" />Schedule</>}
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
+                    
+                    <main className="max-w-7xl mx-auto px-4 py-8">
+                        {view === 'admin' && <Dashboard customers={customers} locations={locations} appointments={appointments} />}
+                        {view === 'customers' && <Customers customers={customers} setCustomers={setCustomers} onView={(id) => setBookingId(id)} />}
+                        {view === 'locations' && <Locations locations={locations} setLocations={setLocations} />}
+                        {view === 'schedule' && <Schedule locations={locations} schedule={schedule} setSchedule={setSchedule} />}
+                    </main>
+                </div>
+            );
+        }
+
+        // Dashboard, Customers, Locations, Schedule, BookingPage components...
+        // (Keep the same as before - I'll include simplified versions)
+
+        function Dashboard({ customers, locations, appointments }) {
+            const upcoming = appointments.filter(a => new Date(a.date + 'T' + a.time) >= new Date()).slice(0, 5);
+            return (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-4 gap-6">
+                        {[{t:'Customers', v:customers.length}, {t:'Locations', v:locations.length}, {t:'Upcoming', v:upcoming.length}, {t:'Total', v:appointments.length}].map((s,i)=><div key={i} className="bg-white rounded-2xl shadow-lg p-6"><p className="text-sm text-gray-500 uppercase">{s.t}</p><p className="text-4xl font-bold mt-2">{s.v}</p></div>)}
+                    </div>
+                </div>
+            );
+        }
+
+        function Customers({ customers, setCustomers, onView }) {
+            const [show, setShow] = useState(false), [edit, setEdit] = useState(null), [form, setForm] = useState({ name: '', email: '', phone: '' });
+            const save = e => { e.preventDefault(); edit ? setCustomers(customers.map(c => c.id === edit.id ? { ...c, ...form } : c)) : setCustomers([...customers, { id: generateId(), ...form }]); setShow(false); setEdit(null); setForm({ name: '', email: '', phone: '' }); };
+            const copy = id => { navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?booking=${id}`); alert('🎉 Customer booking link copied!'); };
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between"><h2 className="text-3xl font-bold">Customers</h2><button onClick={() => { setEdit(null); setForm({ name: '', email: '', phone: '' }); setShow(true); }} className="flex items-center space-x-2 px-6 py-3 gradient-gold text-white rounded-xl font-semibold"><Plus className="w-5 h-5" /><span>Add</span></button></div>
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden"><table className="min-w-full"><thead className="gradient-gold text-white"><tr>{['Name','Email','Phone','Actions'].map(h=><th key={h} className="px-6 py-4 text-left font-bold">{h}</th>)}</tr></thead><tbody>{customers.map(c => <tr key={c.id} className="border-t hover:bg-yellow-50"><td className="px-6 py-4 font-semibold">{c.name}</td><td className="px-6 py-4">{c.email}</td><td className="px-6 py-4">{c.phone}</td><td className="px-6 py-4"><button onClick={() => copy(c.id)} className="p-2 text-yellow-600 hover:bg-yellow-100 rounded-lg mr-2"><LinkIcon className="w-5 h-5" /></button><button onClick={() => onView(c.id)} className="p-2 text-green-600 hover:bg-green-100 rounded-lg mr-2"><Calendar className="w-5 h-5" /></button><button onClick={() => { setEdit(c); setForm(c); setShow(true); }} className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg mr-2"><Edit2 className="w-5 h-5" /></button><button onClick={() => confirm('Delete?') && setCustomers(customers.filter(x => x.id !== c.id))} className="p-2 text-red-600 hover:bg-red-100 rounded-lg"><Trash2 className="w-5 h-5" /></button></td></tr>)}</tbody></table></div>
+                    {show && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md"><h3 className="text-2xl font-bold mb-6">{edit ? 'Edit' : 'Add'} Customer</h3><form onSubmit={save} className="space-y-4">{['name','email','phone'].map(f=><div key={f}><label className="block text-sm font-bold mb-2 uppercase">{f}</label><input type={f==='email'?'email':f==='phone'?'tel':'text'} value={form[f]} onChange={e=>setForm({...form,[f]:e.target.value})} className="w-full px-4 py-3 border-2 rounded-xl" required /></div>)}<div className="flex justify-end space-x-3"><button type="button" onClick={()=>setShow(false)} className="px-6 py-3 border-2 rounded-xl">Cancel</button><button type="submit" className="px-6 py-3 gradient-gold text-white rounded-xl font-semibold">Save</button></div></form></div></div>}
+                </div>
+            );
+        }
+
+        function Locations({ locations, setLocations }) {
+            const [show, setShow] = useState(false), [edit, setEdit] = useState(null), [form, setForm] = useState({ name: '', address: '', availableDays: [], startTime: '09:00', endTime: '17:00', slotDuration: 60 });
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const save = e => { e.preventDefault(); edit ? setLocations(locations.map(l => l.id === edit.id ? { ...l, ...form } : l)) : setLocations([...locations, { id: generateId(), ...form }]); setShow(false); setEdit(null); setForm({ name: '', address: '', availableDays: [], startTime: '09:00', endTime: '17:00', slotDuration: 60 }); };
+            const toggle = d => setForm({ ...form, availableDays: form.availableDays.includes(d) ? form.availableDays.filter(x => x !== d) : [...form.availableDays, d] });
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between"><h2 className="text-3xl font-bold">Locations</h2><button onClick={() => { setEdit(null); setForm({ name: '', address: '', availableDays: [], startTime: '09:00', endTime: '17:00', slotDuration: 60 }); setShow(true); }} className="px-6 py-3 gradient-gold text-white rounded-xl font-semibold"><Plus className="w-5 h-5 inline mr-2" />Add</button></div>
+                    <div className="grid grid-cols-3 gap-6">{locations.map(l => <div key={l.id} className="bg-white rounded-2xl shadow-xl p-6"><h3 className="text-lg font-bold">{l.name}</h3><p className="text-sm text-gray-600 mt-1">{l.address}</p><p className="text-sm mt-2">{l.startTime} - {l.endTime}</p><div className="flex flex-wrap gap-1 mt-2">{l.availableDays.map(d => <span key={d} className="px-2 py-1 bg-yellow-100 rounded text-xs">{d}</span>)}</div><div className="flex justify-end space-x-2 mt-4 pt-4 border-t"><button onClick={() => { setEdit(l); setForm(l); setShow(true); }} className="p-2 text-blue-600 hover:bg-blue-100 rounded"><Edit2 className="w-4 h-4" /></button><button onClick={() => confirm('Delete?') && setLocations(locations.filter(x => x.id !== l.id))} className="p-2 text-red-600 hover:bg-red-100 rounded"><Trash2 className="w-4 h-4" /></button></div></div>)}</div>
+                    {show && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"><div className="bg-white rounded-3xl p-8 w-full max-w-md my-8"><h3 className="text-2xl font-bold mb-4">{edit ? 'Edit' : 'Add'} Location</h3><form onSubmit={save} className="space-y-4"><div><label className="block text-sm font-bold mb-1">Name</label><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-3 border-2 rounded-xl" required /></div><div><label className="block text-sm font-bold mb-1">Address</label><input type="text" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full px-4 py-3 border-2 rounded-xl" required /></div><div><label className="block text-sm font-bold mb-2">Days</label><div className="grid grid-cols-4 gap-2">{days.map(d => <button key={d} type="button" onClick={() => toggle(d)} className={`px-3 py-2 rounded-xl text-sm ${form.availableDays.includes(d) ? 'gradient-gold text-white' : 'bg-gray-100'}`}>{d.substring(0, 3)}</button>)}</div></div><div className="grid grid-cols-2 gap-4"><div><label className="block text-sm font-bold mb-1">Start</label><input type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} className="w-full px-4 py-3 border-2 rounded-xl" required /></div><div><label className="block text-sm font-bold mb-1">End</label><input type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} className="w-full px-4 py-3 border-2 rounded-xl" required /></div></div><div><label className="block text-sm font-bold mb-1">Duration (min)</label><select value={form.slotDuration} onChange={e => setForm({ ...form, slotDuration: parseInt(e.target.value) })} className="w-full px-4 py-3 border-2 rounded-xl">{[30,45,60,90,120].map(m=><option key={m} value={m}>{m}</option>)}</select></div><div className="flex justify-end space-x-3"><button type="button" onClick={() => setShow(false)} className="px-6 py-3 border-2 rounded-xl">Cancel</button><button type="submit" className="px-6 py-3 gradient-gold text-white rounded-xl">Save</button></div></form></div></div>}
+                </div>
+            );
+        }
+
+        function Schedule({ locations, schedule, setSchedule }) {
+            const [week, setWeek] = useState(() => { const d = new Date(); d.setDate(d.getDate() - d.getDay()); return d; });
+            const dates = Array.from({ length: 7 }, (_, i) => { const d = new Date(week); d.setDate(week.getDate() + i); return d; });
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const getLocation = date => schedule.find(s => s.date === date.toISOString().split('T')[0])?.locationId || '';
+            const setLocation = (date, locationId) => {
+                const str = date.toISOString().split('T')[0], idx = schedule.findIndex(s => s.date === str);
+                idx >= 0 ? (locationId ? setSchedule(schedule.map((s, i) => i === idx ? { date: str, locationId } : s)) : setSchedule(schedule.filter(s => s.date !== str))) : locationId && setSchedule([...schedule, { date: str, locationId }]);
+            };
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between"><h2 className="text-3xl font-bold">Schedule</h2><div className="flex space-x-4"><button onClick={() => setWeek(new Date(week.getTime() - 7 * 86400000))} className="p-2 hover:bg-gray-100 rounded"><ChevronLeft className="w-5 h-5" /></button><button onClick={() => { const d = new Date(); d.setDate(d.getDate() - d.getDay()); setWeek(d); }} className="px-4 py-2 border rounded-xl">This Week</button><button onClick={() => setWeek(new Date(week.getTime() + 7 * 86400000))} className="p-2 hover:bg-gray-100 rounded"><ChevronRight className="w-5 h-5" /></button></div></div>
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden"><div className="grid grid-cols-7 gap-px bg-gray-200">{dates.map((date, i) => { const loc = locations.find(l => l.id === getLocation(date)); return <div key={i} className="bg-white p-4 min-h-[200px]"><div className="text-center mb-3"><div className="text-xs font-medium text-gray-600">{days[i]}</div><div className="text-lg font-bold">{date.getDate()}/{date.getMonth() + 1}</div></div><select value={getLocation(date)} onChange={e => setLocation(date, e.target.value)} className="w-full px-2 py-2 text-sm border rounded-xl"><option value="">None</option>{locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}</select>{loc && <div className="mt-2 p-2 bg-yellow-50 rounded text-xs"><div className="truncate">{loc.address}</div></div>}</div>; })}</div></div>
+                </div>
+            );
+        }
+
+        function BookingPage({ id, customers, locations, schedule, appointments, setAppointments }) {
+            const [date, setDate] = useState(null), [time, setTime] = useState(null), [confirmed, setConfirmed] = useState(false);
+            const customer = customers.find(c => c.id === id);
+            if (!customer) return <div className="min-h-screen flex items-center justify-center"><div className="text-center"><h2 className="text-2xl font-bold mb-2">Customer Not Found</h2></div></div>;
+            
+            const getAvailableDates = () => {
+                const dates = [], today = new Date();
+                for (let i = 0; i < 30; i++) {
+                    const d = new Date(today);
+                    d.setDate(today.getDate() + i);
+                    const str = d.toISOString().split('T')[0], sched = schedule.find(s => s.date === str);
+                    if (sched) {
+                        const loc = locations.find(l => l.id === sched.locationId);
+                        if (loc) dates.push({ date: d, location: loc });
+                    }
+                }
+                return dates;
+            };
+            
+            const getAvailableSlots = () => {
+                if (!date) return [];
+                const str = date.toISOString().split('T')[0], sched = schedule.find(s => s.date === str);
+                if (!sched) return [];
+                const loc = locations.find(l => l.id === sched.locationId);
+                if (!loc) return [];
+                const slots = [], [sh, sm] = loc.startTime.split(':').map(Number), [eh, em] = loc.endTime.split(':').map(Number);
+                let current = sh * 60 + sm;
+                const end = eh * 60 + em;
+                while (current + loc.slotDuration <= end) {
+                    const h = Math.floor(current / 60), m = current % 60, timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                    const booked = appointments.some(a => a.date === str && a.time === timeStr && a.locationId === loc.id);
+                    if (!booked) slots.push({ time: timeStr, locationId: loc.id });
+                    current += loc.slotDuration;
+                }
+                return slots;
+            };
+            
+            const book = () => {
+                if (!date || !time) return;
+                const str = date.toISOString().split('T')[0], sched = schedule.find(s => s.date === str), loc = locations.find(l => l.id === sched.locationId);
+                setAppointments([...appointments, { id: generateId(), customerId: customer.id, locationId: loc.id, date: str, time, duration: loc.slotDuration, createdAt: new Date().toISOString() }]);
+                setConfirmed(true);
+            };
+            
+            const downloadICS = () => {
+                if (!confirmed || !date || !time) return;
+                const str = date.toISOString().split('T')[0], apt = appointments.find(a => a.customerId === customer.id && a.date === str && a.time === time);
+                if (!apt) return;
+                const loc = locations.find(l => l.id === apt.locationId), ics = generateICS(apt, customer.name, loc.name), blob = new Blob([ics], { type: 'text/calendar' }), link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'appointment.ics';
+                link.click();
+            };
+            
+            const openGoogleCalendar = () => {
+                if (!confirmed || !date || !time) return;
+                const str = date.toISOString().split('T')[0], apt = appointments.find(a => a.customerId === customer.id && a.date === str && a.time === time);
+                if (!apt) return;
+                const loc = locations.find(l => l.id === apt.locationId);
+                addToGoogleCalendar(apt, customer.name, loc.name, loc.address);
+            };
+            
+            const availableDates = getAvailableDates(), availableSlots = getAvailableSlots();
+            
+            if (confirmed) {
+                const str = date.toISOString().split('T')[0], sched = schedule.find(s => s.date === str), loc = locations.find(l => l.id === sched.locationId);
+                return (
+                    <div className="min-h-screen flex items-center justify-center p-4">
+                        <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-lg w-full text-center">
+                            <div className="w-24 h-24 gradient-gold rounded-full flex items-center justify-center mx-auto mb-6">
+                                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                            </div>
+                            <h2 className="text-3xl font-bold mb-3">Appointment Confirmed!</h2>
+                            <p className="text-gray-600 mb-8 text-lg">See you soon at {BUSINESS_INFO.name}!</p>
+                            <div className="bg-yellow-50 rounded-2xl p-6 mb-8 text-left"><div className="space-y-4"><div className="flex items-start space-x-4"><Calendar className="w-6 h-6 text-yellow-600 mt-1" /><div><p className="text-sm font-medium text-gray-500">Date</p><p className="text-lg font-bold">{formatDate(str)}</p></div></div><div className="flex items-start space-x-4"><Clock className="w-6 h-6 text-yellow-600 mt-1" /><div><p className="text-sm font-medium text-gray-500">Time</p><p className="text-lg font-bold">{time}</p></div></div><div className="flex items-start space-x-4"><MapPin className="w-6 h-6 text-yellow-600 mt-1" /><div><p className="text-sm font-medium text-gray-500">Location</p><p className="text-lg font-bold">{loc.name}</p><p className="text-sm text-gray-600">{loc.address}</p></div></div></div></div>
+                            <div className="space-y-3"><button onClick={openGoogleCalendar} className="w-full flex items-center justify-center space-x-3 px-6 py-4 gradient-gold text-white rounded-xl font-semibold text-lg"><svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg><span>Add to Google Calendar</span></button><button onClick={downloadICS} className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-white border-2 border-yellow-400 text-yellow-700 rounded-xl font-semibold"><Download className="w-5 h-5" /><span>Download .ICS File</span></button></div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            return (
+                <div className="min-h-screen py-8">
+                    <div className="max-w-5xl mx-auto px-4">
+                        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                            <div className="gradient-gold text-white p-8"><div className="flex items-center space-x-3 mb-3"><Sparkles className="w-8 h-8" /><h1 className="text-3xl font-bold">Book Your Appointment</h1></div><p className="text-xl text-yellow-100">Hello {customer.name}, let's find the perfect time</p></div>
+                            <div className="p-8">{availableDates.length === 0 ? <div className="text-center py-16"><Calendar className="w-20 h-20 text-gray-300 mx-auto mb-6" /><h3 className="text-2xl font-bold mb-2">No Available Dates</h3><p className="text-gray-600">Check back later</p></div> : <div className="space-y-10"><div><h3 className="text-2xl font-bold mb-6"><Calendar className="w-6 h-6 inline mr-3 text-yellow-600" />Select Your Date</h3><div className="grid grid-cols-1 md:grid-cols-3 gap-4">{availableDates.map(({ date: d, location }) => <button key={d.toISOString()} onClick={() => { setDate(d); setTime(null); }} className={`p-6 rounded-2xl border-2 text-left ${date?.toDateString() === d.toDateString() ? 'border-yellow-500 bg-yellow-50' : 'border-gray-200 hover:border-yellow-300'}`}><div className="font-bold text-lg mb-2">{formatDate(d.toISOString().split('T')[0])}</div><div className="flex items-center space-x-2 text-sm text-gray-600"><MapPin className="w-4 h-4 text-yellow-600" /><span>{location.name}</span></div></button>)}</div></div>{date && <div><h3 className="text-2xl font-bold mb-6"><Clock className="w-6 h-6 inline mr-3 text-yellow-600" />Select Your Time</h3>{availableSlots.length === 0 ? <div className="text-center py-12 bg-gray-50 rounded-2xl"><p className="text-gray-500">No available times</p></div> : <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">{availableSlots.map(({ time: t }) => <button key={t} onClick={() => setTime(t)} className={`px-4 py-4 rounded-xl border-2 font-bold text-lg ${time === t ? 'border-yellow-500 gradient-gold text-white' : 'border-gray-200 hover:border-yellow-400 bg-white'}`}>{t}</button>)}</div>}</div>}{date && time && <div className="pt-6 border-t-2"><button onClick={book} className="w-full px-8 py-5 gradient-gold text-white rounded-2xl font-bold text-xl"><Sparkles className="w-6 h-6 inline mr-3" />Confirm My Appointment</button></div>}</div>}</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
